@@ -119,5 +119,47 @@ namespace Arvore_Trie
             if (!noPai.EhFimDePalavra)
                 noPai.EhFimDePalavra = true;
         }
+        public static bool BuscaNaArvoreTrie(Trie avr, String word)
+        {
+            if (avr == null)
+            {
+                Console.WriteLine("A palavra nao esta na arvore");
+                return false;
+            }
+            /*
+            Console.WriteLine("\n indormação do no: " + avr.Info);
+            Console.WriteLine("Palavra a ser buscada: " + word);
+            Console.WriteLine("tamanho restante da palavra: " + word.Length);
+            */
+            if (avr.Info == '\0') //No raiz == null, percorre filho esquerdo
+            {
+                return BuscaNaArvoreTrie(avr.filhoEsq, word.Substring(0, word.Length));
+            }
+            else if (word.Length == 1 && avr.Info == word[0])
+            {
+                if (avr.ehFimDePalavra)
+                {
+                    Console.WriteLine("A palavra esta na arvore");
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("palavra nao encontrada, nao há fim de marcador");
+                    return false;
+                }
+            }
+            else if (avr.Info == word[0])
+            {
+                return BuscaNaArvoreTrie(avr.filhoEsq, word.Substring(1, word.Length - 1));
+
+            }
+            else if (avr.irmaoDir != null)
+            {
+               return BuscaNaArvoreTrie(avr.irmaoDir, word);
+            }
+            
+            Console.WriteLine("Palavra nao encontrada");
+            return false;
+        }
     }
 }
