@@ -161,5 +161,80 @@ namespace Arvore_Trie
             Console.WriteLine("Palavra nao encontrada");
             return false;
         }
+        
+        public static Trie IrmaoEsquerda(Trie possivelIrmao, Trie nodo)
+        {
+            if (possivelIrmao.irmaoDir == nodo) return possivelIrmao;
+            else if (possivelIrmao.irmaoDir != null) return IrmaoEsquerda(possivelIrmao.irmaoDir, nodo);
+            else return null;
+        }
+
+        public static Trie NodoIrmaoCorrespondente(Trie nodo, char letra) //RETORNA O NODO ENTRE IRMÃOS QUE CORRESPONDE À LETRA PASSADA
+        {
+            if (nodo.info == letra) return nodo;
+            else if (nodo.irmaoDir != null) return NodoIrmaoCorrespondente(nodo.irmaoDir, letra);
+            else return null;
+        }
+
+        public static void RemoverNodo(Trie pai, Trie nodo)
+        {
+            if (nodo.irmaoDir != null) //NODO TEM IRMÃO A DIREITA
+            {
+                pai.filhoEsq = nodo.irmaoDir; //PONTEIRO DE FILHO É AJUSTADO PARA O IRMÃO A DIREITA
+            }
+            else //NODO NÃO TEM FILHO NEM IRMÃO A DIREITA
+            {
+                pai.filhoEsq = null; //RETIRA-SE PONTEIRO DE FILHO
+            }
+        }        
+
+	    public static int RemoverPalavraTrieRecursiva(Trie raiz, string palavra)
+        {
+            string palavraNova = palavra.Substring(1);
+
+            if (raiz.filhoEsq.info == palavra[0])
+            {
+                if ((palavra.Length == 1) || (RemoverPalavraTrieRecursiva(raiz.filhoEsq, palavraNova) != 0))
+                {
+                    if(raiz.filhoEsq.ehFimDePalavra == true && palavra.Length > 1) 
+                    {
+                        return 0;
+                    }
+                    if (raiz.filhoEsq.filhoEsq != null) //ULTIMA LETRA ACHADA TEM FILHO
+                    {
+                        raiz.filhoEsq.ehFimDePalavra = false;
+                        return 1;
+                    }
+                    RemoverNodo(raiz, raiz.filhoEsq); //ULTIMA LETRA ACHADA NÃO TEM FILHO
+                    return 1;
+                }
+            }
+            else if (raiz.filhoEsq.irmaoDir != null) //FILHO DA RAIZ TEM IRMÃOS A DIREITA
+            {
+                if (NodoIrmaoCorrespondente(raiz.filhoEsq.irmaoDir, palavra[0]) != null) //SE LETRA FOR ACHADA ENTRE OS IRMÃOS 
+                {
+                    if ((palavra.Length == 1) || (RemoverPalavraTrieRecursiva(NodoIrmaoCorrespondente(raiz.filhoEsq.irmaoDir, palavra[0]), palavraNova) != 0))
+                    {
+                        if(NodoIrmaoCorrespondente(raiz.filhoEsq.irmaoDir, palavra[0]).ehFimDePalavra == true && palavra.Length > 1)
+                        {
+                            return 0;
+                        }
+                        if (NodoIrmaoCorrespondente(raiz.filhoEsq.irmaoDir, palavra[0]).filhoEsq != null) //ULTIMA LETRA ACHADA TEM FILHO
+                        {
+                            NodoIrmaoCorrespondente(raiz.filhoEsq.irmaoDir, palavra[0]).ehFimDePalavra = false;
+                            return 1;
+                        }
+                        else //ULTIMA LETRA ACHADA NÃO TEM FILHO
+                        {
+                            IrmaoEsquerda( raiz.filhoEsq, NodoIrmaoCorrespondente( raiz.filhoEsq.irmaoDir, palavra[0] ) ).irmaoDir = NodoIrmaoCorrespondente( raiz.filhoEsq.irmaoDir, palavra[0] ).irmaoDir;
+                        }
+                    }
+                    else return 0; //PALAVRA NÃO FOI ACHADA
+                }
+            }
+            return 0; //PALAVRA NÃO FOI ACHADA 
+        }
+
+
     }
 }
