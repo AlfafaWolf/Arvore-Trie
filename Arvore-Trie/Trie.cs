@@ -66,17 +66,26 @@ namespace Arvore_Trie
             return no.IrmaoDir.IrmaoDir != null;
         }
 
+        /// <summary>
+        /// Adiciona uma palavra a arvore
+        /// </summary>
+        /// <param name="palavra"></param>
         public void AdicTrie(string palavra)
         {
             Trie.AdicTrie(this, palavra);
         }
 
+        /// <summary>
+        /// Adiciona uma palavra a raiz
+        /// </summary>
+        /// <param name="raiz"></param>
+        /// <param name="palavra"></param>
         public static void AdicTrie(Trie raiz, string palavra)
         {
             Trie noPai = raiz;
             for (int i = 0; i < palavra.Length ; i++)
             {
-                Console.WriteLine($"letra '{palavra[i].ToString()}' {i}"); // DEBUG
+                //Console.WriteLine($"letra '{palavra[i].ToString()}' {i}"); // DEBUG
 
                 char letra = palavra[i];
                 if (!TemFilhoTrie(noPai))
@@ -84,7 +93,7 @@ namespace Arvore_Trie
                     Trie novoNo = CriaNoTrie(letra);
                     noPai.FilhoEsq = novoNo;
                     noPai = novoNo;
-                    Console.WriteLine($"Novo no adicionado, {letra}"); // DEBUG
+                    //Console.WriteLine($"Novo no adicionado, {letra}"); // DEBUG
                 }
                 else
                 {
@@ -93,10 +102,10 @@ namespace Arvore_Trie
                     bool letraJaExiste = false;
                     for (prim = noPai.FilhoEsq; prim != null; prevNo = prim, prim = prim.IrmaoDir)
                     {
-                        Console.WriteLine(prim.Info.Equals(letra)); // DEBUG
+                        //Console.WriteLine(prim.Info.Equals(letra)); // DEBUG
                         if (prim.Info.Equals(letra))
                         {
-                            Console.WriteLine($"{prim.Info} == {letra}"); // DEBUG
+                            //Console.WriteLine($"{prim.Info} == {letra}"); // DEBUG
                             letraJaExiste = true;
                             break;
                         } 
@@ -107,7 +116,7 @@ namespace Arvore_Trie
                         Trie novoNo = CriaNoTrie(letra);
                         prevNo.IrmaoDir = novoNo;
                         noPai = novoNo;
-                        Console.WriteLine($"{prevNo.Info} -> {novoNo.Info}"); // DEBUG
+                        //Console.WriteLine($"{prevNo.Info} -> {novoNo.Info}"); // DEBUG
                     }
                     else
                     {
@@ -119,49 +128,43 @@ namespace Arvore_Trie
             if (!noPai.EhFimDePalavra)
                 noPai.EhFimDePalavra = true;
         }
-        public static bool BuscaNaArvoreTrie(Trie avr, String word)
+
+        /// <summary>
+        /// Busca uma palavra na arvore, ignorando o elemento da raiz
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
+        public bool BuscaNaArvoreTrie(string word)
+        {
+            return Trie.BuscaNaArvoreTrie(this.filhoEsq, word);
+        }
+
+        /// <summary>
+        /// Busca uma palavra na arvore, incluindo o elemento da raiz
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
+        public static bool BuscaNaArvoreTrie(Trie avr, string word)
         {
             if (avr == null)
-            {
-                Console.WriteLine("A palavra nao esta na arvore");
                 return false;
-            }
-            /*
-            Console.WriteLine("\n indormação do no: " + avr.Info);
-            Console.WriteLine("Palavra a ser buscada: " + word);
-            Console.WriteLine("tamanho restante da palavra: " + word.Length);
-            */
-            if (avr.Info == '\0') //No raiz == null, percorre filho esquerdo
-            {
-                return BuscaNaArvoreTrie(avr.filhoEsq, word.Substring(0, word.Length));
-            }
-            else if (word.Length == 1 && avr.Info == word[0])
-            {
-                if (avr.ehFimDePalavra)
-                {
-                    Console.WriteLine("A palavra esta na arvore");
-                    return true;
-                }
-                else
-                {
-                    Console.WriteLine("palavra nao encontrada, nao há fim de marcador");
-                    return false;
-                }
-            }
             else if (avr.Info == word[0])
             {
-                return BuscaNaArvoreTrie(avr.filhoEsq, word.Substring(1, word.Length - 1));
 
+                if (word.Length == 1)
+                {
+                    if (avr.ehFimDePalavra)
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                    return BuscaNaArvoreTrie(avr.filhoEsq, word.Substring(1));
             }
-            else if (avr.irmaoDir != null)
-            {
-               return BuscaNaArvoreTrie(avr.irmaoDir, word);
-            }
-            
-            Console.WriteLine("Palavra nao encontrada");
-            return false;
+            else
+                return BuscaNaArvoreTrie(avr.irmaoDir, word);
         }
-        
+
         public static Trie IrmaoEsquerda(Trie possivelIrmao, Trie nodo)
         {
             if (possivelIrmao.irmaoDir == nodo) return possivelIrmao;
@@ -188,6 +191,12 @@ namespace Arvore_Trie
             }
         }        
 
+        /// <summary>
+        /// Remove uma palavra da raiz recursivamente
+        /// </summary>
+        /// <param name="raiz"></param>
+        /// <param name="palavra"></param>
+        /// <returns></returns>
 	    public static int RemoverPalavraTrieRecursiva(Trie raiz, string palavra)
         {
             string palavraNova = palavra.Substring(1);
@@ -226,7 +235,7 @@ namespace Arvore_Trie
                         }
                         else //ULTIMA LETRA ACHADA NÃO TEM FILHO
                         {
-                            IrmaoEsquerda( raiz.filhoEsq, NodoIrmaoCorrespondente( raiz.filhoEsq.irmaoDir, palavra[0] ) ).irmaoDir = NodoIrmaoCorrespondente( raiz.filhoEsq.irmaoDir, palavra[0] ).irmaoDir;
+                            IrmaoEsquerda(raiz.filhoEsq, NodoIrmaoCorrespondente( raiz.filhoEsq.irmaoDir, palavra[0] ) ).irmaoDir = NodoIrmaoCorrespondente( raiz.filhoEsq.irmaoDir, palavra[0] ).irmaoDir;
                         }
                     }
                     else return 0; //PALAVRA NÃO FOI ACHADA
@@ -234,7 +243,5 @@ namespace Arvore_Trie
             }
             return 0; //PALAVRA NÃO FOI ACHADA 
         }
-
-
     }
 }
