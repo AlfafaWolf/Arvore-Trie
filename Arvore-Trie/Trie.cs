@@ -85,42 +85,45 @@ namespace Arvore_Trie
             Trie noPai = raiz;
             for (int i = 0; i < palavra.Length ; i++)
             {
-                //Console.WriteLine($"letra '{palavra[i].ToString()}' {i}"); // DEBUG
-
-                char letra = palavra[i];
+                char letra = palavra[i]; // Letra da iteração
+				
                 if (!TemFilhoTrie(noPai))
                 {
                     Trie novoNo = CriaNoTrie(letra);
                     noPai.FilhoEsq = novoNo;
                     noPai = novoNo;
-                    //Console.WriteLine($"Novo no adicionado, {letra}"); // DEBUG
                 }
                 else
                 {
-                    Trie prevNo = noPai;
-                    Trie prim;
+                    Trie noAnterior = noPai;
+                    Trie filho;
                     bool letraJaExiste = false;
-                    for (prim = noPai.FilhoEsq; prim != null; prevNo = prim, prim = prim.IrmaoDir)
+					// Enquanto filho não for nulo e a nova letra for menor que o seu irmão
+                    for (filho = noPai.FilhoEsq; filho != null && letra.CompareTo(filho.Info) >= 0; noAnterior = filho, filho = filho.IrmaoDir)
                     {
-                        //Console.WriteLine(prim.Info.Equals(letra)); // DEBUG
-                        if (prim.Info.Equals(letra))
+                        if (filho.Info.Equals(letra))   // Letra Existe
                         {
-                            //Console.WriteLine($"{prim.Info} == {letra}"); // DEBUG
                             letraJaExiste = true;
                             break;
                         } 
                     }
 
+					// Caso a letra não exista, adicione-a
+					// Se não, vá pra próxima iteração
                     if (!letraJaExiste)
                     {
-                        Trie novoNo = CriaNoTrie(letra);
-                        prevNo.IrmaoDir = novoNo;
+                        Trie novoNo = CriaNoTrie(letra); // Criar novo Nó
+						
+						if(noAnterior.Equals(noPai))     // Caso a nova letra seja menor que o primeiro Nó filho do Pai
+							noPai.filhoEsq = novoNo;
+						else							 // Se não, a nova letra está em algum lugar entre os filhos
+							noAnterior.IrmaoDir = novoNo;
+						novoNo.IrmaoDir = filho;         // Ajustar Refência
                         noPai = novoNo;
-                        //Console.WriteLine($"{prevNo.Info} -> {novoNo.Info}"); // DEBUG
                     }
                     else
                     {
-                        noPai = prim;
+                        noPai = filho;
                     }
                 }
             }
