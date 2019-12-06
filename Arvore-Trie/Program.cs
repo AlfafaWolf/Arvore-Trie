@@ -44,6 +44,9 @@ namespace Arvore_Trie
                 Console.WriteLine($"palavra: {palavra,-15} - {raiz.BuscaNaArvoreTrie(palavra)}");
             }
 
+            Console.WriteLine("\nPalavras da Arvore: ");
+            Trie.exibeTrie(raiz);
+
             Console.WriteLine("Digite ENTER para encerrar o programa...");
             Console.ReadLine();
         }

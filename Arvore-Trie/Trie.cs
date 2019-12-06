@@ -61,6 +61,16 @@ namespace Arvore_Trie
             return no.FilhoEsq != null;
         }
 
+        public bool TemIrmaoTrie()
+        {
+            return Trie.TemIrmaoTrie(this);
+        }
+
+        public static bool TemIrmaoTrie(Trie no)
+        {
+            return no.IrmaoDir != null;
+        }
+
         public static bool TemProximoIrmaoDir(Trie no)
         {
             return no.IrmaoDir.IrmaoDir != null;
@@ -98,27 +108,27 @@ namespace Arvore_Trie
                     Trie noAnterior = noPai;
                     Trie filho;
                     bool letraJaExiste = false;
-					// Enquanto filho não for nulo e a nova letra for menor que o seu irmão
+                    // Enquanto filho não for nulo e a nova letra for menor que o seu irmão
                     for (filho = noPai.FilhoEsq; filho != null && letra.CompareTo(filho.Info) >= 0; noAnterior = filho, filho = filho.IrmaoDir)
                     {
-                        if (filho.Info.Equals(letra))   // Letra Existe
+                        if (filho.Info.Equals(letra))    // Letra Existe
                         {
                             letraJaExiste = true;
                             break;
-                        } 
+                        }
                     }
 
-					// Caso a letra não exista, adicione-a
-					// Se não, vá pra próxima iteração
+                    // Caso a letra não exista, adicione-a
+                    // Se não, vá pra próxima iteração
                     if (!letraJaExiste)
                     {
                         Trie novoNo = CriaNoTrie(letra); // Criar novo Nó
 						
-						if(noAnterior.Equals(noPai))     // Caso a nova letra seja menor que o primeiro Nó filho do Pai
-							noPai.filhoEsq = novoNo;
-						else							 // Se não, a nova letra está em algum lugar entre os filhos
-							noAnterior.IrmaoDir = novoNo;
-						novoNo.IrmaoDir = filho;         // Ajustar Refência
+                        if(noAnterior.Equals(noPai))     // Caso a nova letra seja menor que o primeiro Nó filho do Pai
+                            noPai.filhoEsq = novoNo;
+                        else							 // Se não, a nova letra está em algum lugar entre os filhos
+                            noAnterior.IrmaoDir = novoNo;
+                        novoNo.IrmaoDir = filho;         // Ajustar Refência
                         noPai = novoNo;
                     }
                     else
@@ -133,7 +143,43 @@ namespace Arvore_Trie
         }
 
         /// <summary>
-        /// Busca uma palavra na arvore, ignorando o elemento da raiz
+        /// Exibe todas as palavras armazenadas na Trie
+        /// </summary>
+        /// <param name="raiz"></param>
+        public static void exibeTrie(Trie raiz)
+        {
+            if (raiz == null) return;
+            for (Trie prox = raiz; prox != null; prox = prox.IrmaoDir)
+            {
+                string palavra = string.Empty;
+                exibePalavras(prox, palavra);
+            }
+        }
+
+        /// <summary>
+        /// Axibe todas as palavras da raiz
+        /// </summary>
+        /// <param name="raiz"></param>
+        /// <param name="palavra"></param>
+        public static void exibePalavras(Trie raiz, string palavra)
+        {
+            if (raiz == null) return;
+            if (raiz.ehFimDePalavra)
+            {
+                Console.WriteLine(palavra + raiz.Info);
+            }
+            if (raiz.FilhoEsq != null)
+            {
+                exibePalavras(raiz.FilhoEsq, palavra + raiz.Info);
+            }
+            if (raiz.IrmaoDir != null)
+            {
+                exibePalavras(raiz.IrmaoDir, palavra);
+            }
+        }
+
+        /// <summary>
+        /// Busca uma palavra na árvore, ignorando o elemento da raiz
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
@@ -143,29 +189,31 @@ namespace Arvore_Trie
         }
 
         /// <summary>
-        /// Busca uma palavra na arvore, incluindo o elemento da raiz
+        /// Busca uma palavra na árvore, incluindo o elemento da raiz
         /// </summary>
         /// <param name="word"></param>
         /// <returns></returns>
-        public static bool BuscaNaArvoreTrie(Trie avr, string word)
+        public static bool BuscaNaArvoreTrie(Trie raiz, string word)
         {
-            if (avr == null)
+            if (raiz == null)
                 return false;
-            else if (avr.Info == word[0])
+            if (raiz.Info == '\0') // Ignorar Raiz
+                return BuscaNaArvoreTrie(raiz.filhoEsq, word); 
+            else if (raiz.Info == word[0])
             {
 
                 if (word.Length == 1)
                 {
-                    if (avr.ehFimDePalavra)
+                    if (raiz.ehFimDePalavra)
                         return true;
                     else
                         return false;
                 }
                 else
-                    return BuscaNaArvoreTrie(avr.filhoEsq, word.Substring(1));
+                    return BuscaNaArvoreTrie(raiz.filhoEsq, word.Substring(1));
             }
             else
-                return BuscaNaArvoreTrie(avr.irmaoDir, word);
+                return BuscaNaArvoreTrie(raiz.irmaoDir, word);
         }
 
         public static Trie IrmaoEsquerda(Trie possivelIrmao, Trie nodo)
